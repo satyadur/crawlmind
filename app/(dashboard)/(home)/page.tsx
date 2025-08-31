@@ -11,17 +11,17 @@ import ExecutionStatusChart from "./_components/ExecutionStatusChart";
 import { GetCreditUsageInPeriod } from "@/actions/analytics/getCreditUsageInPeriod";
 import CreditUsageChart from "../billing/_components/CreditUsageChart";
 
-const HomePage = ({
-  searchParams,
-}: {
-  searchParams: { month?: string; year?: string };
-}) => {
+type HomePageProps = {
+  searchParams?: { [key: string]: string | string[] | undefined }
+}
+
+const HomePage = ({ searchParams }: HomePageProps) => {
   const currentDate = new Date();
-  const { month, year } = searchParams;
+  const { month, year } = searchParams || {}
   const period: Period = {
-    month: month ? parseInt(month) : currentDate.getMonth(),
-    year: year ? parseInt(year) : currentDate.getFullYear(),
-  };
+    month: month ? parseInt(month as string) : currentDate.getMonth(), // careful: getMonth is 0-based
+    year: year ? parseInt(year as string) : currentDate.getFullYear(),
+  }
 
   return (
     <div className="flex flex-1 flex-col h-full">
