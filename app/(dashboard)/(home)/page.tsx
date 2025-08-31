@@ -17,11 +17,14 @@ type HomePageProps = {
 
 const HomePage = ({ searchParams }: HomePageProps) => {
   const currentDate = new Date();
-  const { month, year } = searchParams || {}
-  const period: Period = {
-    month: month ? parseInt(month as string) : currentDate.getMonth(), // careful: getMonth is 0-based
-    year: year ? parseInt(year as string) : currentDate.getFullYear(),
-  }
+
+  const month = searchParams?.month as string | undefined;
+  const year = searchParams?.year as string | undefined;
+
+  const period = {
+    month: month ? parseInt(month) : currentDate.getMonth(),
+    year: year ? parseInt(year) : currentDate.getFullYear(),
+  };
 
   return (
     <div className="flex flex-1 flex-col h-full">
