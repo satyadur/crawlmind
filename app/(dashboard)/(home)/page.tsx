@@ -12,10 +12,14 @@ import { GetCreditUsageInPeriod } from "@/actions/analytics/getCreditUsageInPeri
 import CreditUsageChart from "../billing/_components/CreditUsageChart";
 
 type HomePageProps = {
-  searchParams?: { [key: string]: string | string[] | undefined }
-}
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
-const HomePage = ({ searchParams }: HomePageProps) => {
+function HomePage({
+  searchParams,
+}: {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
   const currentDate = new Date();
 
   const month = searchParams?.month as string | undefined;
@@ -47,7 +51,7 @@ const HomePage = ({ searchParams }: HomePageProps) => {
       </div>
     </div>
   );
-};
+}
 
 async function PeriodSelectorWrapper({
   selectedPeriod,
