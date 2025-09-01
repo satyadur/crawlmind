@@ -86,6 +86,9 @@ Prisma.NullTypes = {
  * Enums
  */
 exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
+  ReadUncommitted: 'ReadUncommitted',
+  ReadCommitted: 'ReadCommitted',
+  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 });
 
@@ -171,6 +174,11 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.QueryMode = {
+  default: 'default',
+  insensitive: 'insensitive'
+};
+
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
@@ -197,7 +205,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "c:\\saas_project\\prisma\\@\\lib\\prisma",
+      "value": "C:\\saas_project\\prisma\\@\\lib\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -211,7 +219,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "c:\\saas_project\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\saas_project\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -224,18 +232,17 @@ const config = {
   "datasourceNames": [
     "db"
   ],
-  "activeProvider": "sqlite",
-  "postinstall": false,
+  "activeProvider": "postgresql",
   "inlineDatasources": {
     "db": {
       "url": {
-        "fromEnvVar": null,
-        "value": "file:./dev.db"
+        "fromEnvVar": "DATABASE_URL",
+        "value": null
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"@/lib/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n  url      = \"file:./dev.db\"\n}\n\nmodel WorkFlow {\n  id          String  @id @default(cuid())\n  userId      String\n  name        String\n  description String?\n\n  definition    String\n  executionPlan String?\n  creditsCost   Int     @default(0)\n\n  cron String?\n\n  status String //DRAFT | PUBLISHED\n\n  lastRunAt     DateTime?\n  lastRunId     String?\n  lastRunStatus String?\n  nextRunAt     DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  executions WorkflowExecution[]\n\n  // user cannot have two workflows with the same name\n  @@unique([name, userId])\n}\n\nmodel WorkflowExecution {\n  id              String    @id @default(cuid())\n  workflowId      String\n  userId          String\n  trigger         String\n  status          String\n  createdAt       DateTime  @default(now())\n  startedAt       DateTime?\n  completedAt     DateTime?\n  definition      String    @default(\"{}\")\n  creditsConsumed Int       @default(0)\n\n  phases ExecutionPhase[]\n\n  workflow WorkFlow @relation(fields: [workflowId], references: [id], onDelete: Cascade)\n}\n\nmodel ExecutionPhase {\n  id          String    @id @default(cuid())\n  userId      String\n  status      String\n  number      Int\n  node        String\n  name        String\n  startedAt   DateTime?\n  completedAt DateTime?\n  inputs      String?\n  outputs     String?\n\n  creditsConsumed Int?\n\n  workflowExecutionId String\n  execution           WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)\n\n  logs ExecutionLog[]\n}\n\nmodel ExecutionLog {\n  id        String   @id @default(cuid())\n  logLevel  String\n  message   String\n  timestamp DateTime @default(now())\n\n  executionPhaseId String\n  executionPhase   ExecutionPhase @relation(fields: [executionPhaseId], references: [id], onDelete: Cascade)\n}\n\nmodel UserBalance {\n  userId  String @id\n  credits Int    @default(0)\n}\n\nmodel Credential {\n  id     String @id @default(cuid())\n  userId String\n  name   String\n  value  String\n\n  createdAt DateTime @default(now())\n\n  @@unique([userId, name])\n}\n\nmodel UserPurchase {\n  id          String   @id @default(cuid())\n  userId      String\n  stripeId    String\n  description String\n  amount      Int\n  currency    String\n  date        DateTime @default(now())\n}\n",
-  "inlineSchemaHash": "03f0ffbab66992ac0f809aaac4452125ca0ed2b867dd4757f9dfbe6f5a54e521",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"@/lib/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\" // Changed from \"sqlite\" to \"postgresql\"\n  url      = env(\"DATABASE_URL\") // Changed from \"file:./dev.db\"\n}\n\nmodel WorkFlow {\n  id          String  @id @default(cuid())\n  userId      String\n  name        String\n  description String?\n\n  definition    String\n  executionPlan String?\n  creditsCost   Int     @default(0)\n\n  cron String?\n\n  status String //DRAFT | PUBLISHED\n\n  lastRunAt     DateTime?\n  lastRunId     String?\n  lastRunStatus String?\n  nextRunAt     DateTime?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  executions WorkflowExecution[]\n\n  // user cannot have two workflows with the same name\n  @@unique([name, userId])\n}\n\nmodel WorkflowExecution {\n  id              String    @id @default(cuid())\n  workflowId      String\n  userId          String\n  trigger         String\n  status          String\n  createdAt       DateTime  @default(now())\n  startedAt       DateTime?\n  completedAt     DateTime?\n  definition      String    @default(\"{}\")\n  creditsConsumed Int       @default(0)\n\n  phases ExecutionPhase[]\n\n  workflow WorkFlow @relation(fields: [workflowId], references: [id], onDelete: Cascade)\n}\n\nmodel ExecutionPhase {\n  id          String    @id @default(cuid())\n  userId      String\n  status      String\n  number      Int\n  node        String\n  name        String\n  startedAt   DateTime?\n  completedAt DateTime?\n  inputs      String?\n  outputs     String?\n\n  creditsConsumed Int?\n\n  workflowExecutionId String\n  execution           WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)\n\n  logs ExecutionLog[]\n}\n\nmodel ExecutionLog {\n  id        String   @id @default(cuid())\n  logLevel  String\n  message   String\n  timestamp DateTime @default(now())\n\n  executionPhaseId String\n  executionPhase   ExecutionPhase @relation(fields: [executionPhaseId], references: [id], onDelete: Cascade)\n}\n\nmodel UserBalance {\n  userId  String @id\n  credits Int    @default(0)\n}\n\nmodel Credential {\n  id     String @id @default(cuid())\n  userId String\n  name   String\n  value  String\n\n  createdAt DateTime @default(now())\n\n  @@unique([userId, name])\n}\n\nmodel UserPurchase {\n  id          String   @id @default(cuid())\n  userId      String\n  stripeId    String\n  description String\n  amount      Int\n  currency    String\n  date        DateTime @default(now())\n}\n",
+  "inlineSchemaHash": "d63993c81de16177644f548eb9a303b24733fb9b9707e6b25ee5b51e4f6e9ce8",
   "copyEngine": true
 }
 config.dirname = '/'
@@ -246,7 +253,9 @@ config.engineWasm = undefined
 config.compilerWasm = undefined
 
 config.injectableEdgeEnv = () => ({
-  parsed: {}
+  parsed: {
+    DATABASE_URL: typeof globalThis !== 'undefined' && globalThis['DATABASE_URL'] || typeof process !== 'undefined' && process.env && process.env.DATABASE_URL || undefined
+  }
 })
 
 if (typeof globalThis !== 'undefined' && globalThis['DEBUG'] || typeof process !== 'undefined' && process.env && process.env.DEBUG || undefined) {

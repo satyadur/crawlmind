@@ -7,8 +7,8 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql" // Changed from "sqlite" to "postgresql"
+  url      = env("DATABASE_URL") // Changed from "file:./dev.db"
 }
 
 model WorkFlow {
