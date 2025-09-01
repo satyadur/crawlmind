@@ -1,3 +1,4 @@
+// app/workflow/runs/[workflowId]/page.tsx
 import React, { Suspense } from "react";
 import Topbar from "../../_components/topbar/Topbar";
 import { GetWorkflowExecutions } from "@/actions/workflows/getWorkflowExecutions";
@@ -5,12 +6,18 @@ import { InboxIcon, Loader2Icon } from "lucide-react";
 import { waitFor } from "@/lib/helper/waitFor";
 import ExecutionsTable from "./_components/ExecutionsTable";
 
-function ExecutionsPage({ params }: { params: { workflowId: string } }) {
+export default async function ExecutionsPage({
+  params,
+}: {
+  params: Promise<{ workflowId: string }>;
+}) {
+  const { workflowId } = await params;
+
   return (
     <div className="h-full w-full overflow-auto">
       <Topbar
         hideButtons
-        workflowId={params.workflowId}
+        workflowId={workflowId}
         title="All runs"
         subTitle="List of all your workflow runs"
       />
@@ -21,7 +28,7 @@ function ExecutionsPage({ params }: { params: { workflowId: string } }) {
           </div>
         }
       >
-        <ExecutionsTableWrapper workflowId={params.workflowId} />
+        <ExecutionsTableWrapper workflowId={workflowId} />
       </Suspense>
     </div>
   );
@@ -54,11 +61,10 @@ async function ExecutionsTableWrapper({ workflowId }: { workflowId: string }) {
       </div>
     );
   }
+
   return (
     <div className="py-6 w-full">
-      <ExecutionsTable workflowId={workflowId} initialData={executions} />;
+      <ExecutionsTable workflowId={workflowId} initialData={executions} />
     </div>
   );
 }
-
-export default ExecutionsPage;

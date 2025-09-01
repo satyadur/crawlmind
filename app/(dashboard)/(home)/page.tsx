@@ -11,48 +11,39 @@ import ExecutionStatusChart from "./_components/ExecutionStatusChart";
 import { GetCreditUsageInPeriod } from "@/actions/analytics/getCreditUsageInPeriod";
 import CreditUsageChart from "../billing/_components/CreditUsageChart";
 
-type HomePageProps = {
-  searchParams?: { [key: string]: string | string[] | undefined };
-};
-
-function HomePage({
+async function HomePage({
   searchParams,
 }: {
-  searchParams?: Record<string, string | string[] | undefined>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  const params = await searchParams;
   const currentDate = new Date();
-
-  const month = searchParams?.month as string | undefined;
-  const year = searchParams?.year as string | undefined;
-
-  const period = {
-    month: month ? parseInt(month) : currentDate.getMonth(),
-    year: year ? parseInt(year) : currentDate.getFullYear(),
-  };
+  const month = params.month ? parseInt(params.month as string) : currentDate.getMonth();
+  const year = params.year ? parseInt(params.year as string) : currentDate.getFullYear();
+  const selectedPeriod: Period = { month, year };
 
   return (
     <div className="flex flex-1 flex-col h-full">
       <div className="flex justify-between">
         <h1 className="text-3xl font-bold">Home</h1>
         <Suspense fallback={<Skeleton className="w-[180px] h-[40px]" />}>
-          <PeriodSelectorWrapper selectedPeriod={period} />
+          <PeriodSelectorWrapper selectedPeriod={selectedPeriod} />
         </Suspense>
       </div>
       <div className="h-full py-6 flex flex-col gap-4">
         <Suspense fallback={<StatsCardSkeleton />}>
-          <StatsCards selectedPeriod={period} />
+          <StatsCards selectedPeriod={selectedPeriod} />
         </Suspense>
         <Suspense fallback={<Skeleton className="w-full h-[300px]" />}>
-          <StatsExecutionStatus selectedPeriod={period} />
+          <StatsExecutionStatus selectedPeriod={selectedPeriod} />
         </Suspense>
         <Suspense fallback={<Skeleton className="w-full h-[300px]" />}>
-          <CreditsUsageInPeriod selectedPeriod={period} />
+          <CreditsUsageInPeriod selectedPeriod={selectedPeriod} />
         </Suspense>
       </div>
     </div>
   );
 }
-
 async function PeriodSelectorWrapper({
   selectedPeriod,
 }: {

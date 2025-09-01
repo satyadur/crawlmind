@@ -1,5 +1,5 @@
 "use client";
-import { WorkFlow } from "@/lib/generated/prisma";
+import { WorkFlow } from "@/prisma/@/lib/prisma";
 import { CreateFlowNode } from "@/lib/workflow/createFlowNode";
 import { TaskType } from "@/types/task";
 import {

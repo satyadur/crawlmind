@@ -17,12 +17,18 @@ model WorkFlow {
   name        String
   description String?
 
-  definition String
-  status     String //DRAFT | PUBLISHED
+  definition    String
+  executionPlan String?
+  creditsCost   Int     @default(0)
+
+  cron String?
+
+  status String //DRAFT | PUBLISHED
 
   lastRunAt     DateTime?
   lastRunId     String?
   lastRunStatus String?
+  nextRunAt     DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,4 +72,42 @@ model ExecutionPhase {
 
   workflowExecutionId String
   execution           WorkflowExecution @relation(fields: [workflowExecutionId], references: [id], onDelete: Cascade)
+
+  logs ExecutionLog[]
+}
+
+model ExecutionLog {
+  id        String   @id @default(cuid())
+  logLevel  String
+  message   String
+  timestamp DateTime @default(now())
+
+  executionPhaseId String
+  executionPhase   ExecutionPhase @relation(fields: [executionPhaseId], references: [id], onDelete: Cascade)
+}
+
+model UserBalance {
+  userId  String @id
+  credits Int    @default(0)
+}
+
+model Credential {
+  id     String @id @default(cuid())
+  userId String
+  name   String
+  value  String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, name])
+}
+
+model UserPurchase {
+  id          String   @id @default(cuid())
+  userId      String
+  stripeId    String
+  description String
+  amount      Int
+  currency    String
+  date        DateTime @default(now())
 }
