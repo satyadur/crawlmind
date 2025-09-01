@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "app/**",
+      "use": "@vercel/next"
+    }
+  ],
+  "functions": {
+    "app/api/**/*": {
+      "memory": 1024,
+      "maxDuration": 60
+    },
+    "app/actions/**/*": {
+      "memory": 1024,
+      "maxDuration": 60
+    }
+  }
+}
